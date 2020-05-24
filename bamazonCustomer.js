@@ -48,3 +48,75 @@ function start() {
 		]).
 		then(function(answer) {
 			console.log("\nYOUR ORDER HAS BEEN PLACED!!!\n\nLet me check our stock for you...\n");
+
+            //Creating variables to hold the customer's choices:
+			var chosenProductID = answer.idChosen;
+			var chosenProductUnits = answer.unitsPurchased;
+
+			// If there is not enough quantities, return message
+			connection.query(
+				"SELECT * FROM products WHERE ?",
+				[
+					{
+						id: chosenProductID
+					}
+				],
+				function(error, results) {
+					if (error) throw error;
+
+					//This variable stores the current stock quantity of the Chosen product
+					var currentStock = results[0].stock_quantity;
+
+					if (chosenProductUnits > currentStock){
+						//If BAMAZON doesn't have enough stock
+						console.log("==== YOUR ORDER HAS BEEN CANCELLED DUE TO INSUFFICIENT QUANTITY ====\n");
+						//Calling the continue
+						continuePrompt();
+					} else {
+						// If BAMAZON does have enough of the product, fulfill the customer's order.
+						console.log("==== ITEMS ARE IN STOCK - YOUR ORDER HAS BEEN PROCESSED ====\n");
+
+						//set the total cost and information of the product selected
+						var id = results[0].id;
+						var productName = results[0].product_name;
+						var departmentName = results[0].department_name;
+						var price = results[0].price;
+						var originalStock = results[0].stock_quantity;
+						var totalCost = parseFloat(price * chosenProductUnits);
+
+						//Updating the SQL database to reflect the remaining quantity.
+						var newChosenProductStock = currentStock - chosenProductUnits;
+						connection.query(
+							"UPDATE products SET ? WHERE ?",
+							[
+								{
+									stock_quantity: newChosenProductStock
+								},
+								{
+									id: chosenProductID
+								}
+							],
+							function(error, results) {
+								//UPDATE SUCCESS!
+								console.log("Our product stock quantity of " + originalStock + " has been updated to " + newChosenProductStock + ".\n");
+
+								//Once the update goes through, show the customer the total cost of their purchase.
+								console.log(	"=====================================================================================" +
+												"\nItem number:\t\t\t" + id +
+												"\nProduct Name:\t\t\t" + productName +
+												"\nProduct Category:\t\t" + departmentName +
+												"\nPrice Per Unit:\t\t\t" + price +
+												"\nUnits ordered:\t\t\t" + chosenProductUnits +
+												"\n-------------------------------------------------" +
+												"\nYOUR TOTAL COST IS:\t\t$" + totalCost +
+												"\n=====================================================================================\n\n");
+
+								//Calling the continue
+								continuePrompt();
+							}
+						);
+					}
+			});
+		});
+	});
+}// End of start function
