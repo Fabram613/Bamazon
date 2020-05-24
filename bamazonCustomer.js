@@ -120,3 +120,23 @@ function start() {
 		});
 	});
 }// End of start function
+
+//Function to ask the customer if they wish to continue with another purchase, or end
+function continuePrompt() {
+	inquirer
+	.prompt(
+		{
+			name: "continue",
+			type: "confirm",
+			message: "Would you like to purchase another product?",
+		}
+	)
+	.then(function(answer) {
+		if(answer.continue === true) {
+			start();
+		} else {
+			console.log(	"\n==== THANK YOU FOR SHOPPING WITH BAMAZON - GOODBYE ====\n\n");
+			connection.end();
+		}
+	});
+}
