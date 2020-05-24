@@ -8,7 +8,7 @@ var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "password",
+  password: "",
   database: "bamazon",
 });
 
@@ -23,6 +23,9 @@ connection.connect(function (err) {
   // Run the start function after the connection is made to begin the application
   start();
 });
+
+//MAIN PROCESS
+//============
 
 // Function that prompts the user
 function start() {
