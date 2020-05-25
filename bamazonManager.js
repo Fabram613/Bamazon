@@ -8,7 +8,7 @@ var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "",
+  password: "password",
   database: "bamazon",
 });
 
@@ -91,3 +91,36 @@ function manager() {
       });
   });
 } //End of manager function
+
+//Function that runs when the manager selects View Products for Sale
+function viewProducts() {
+	console.log("\nThese are all the products available on BAMAZON right now: \n");
+	connection.query("SELECT id, product_name, price, stock_quantity FROM products", function(error, results) {
+		if (error) throw error;
+		console.log(JSON.stringify(results, null, " ") + "\n\n=========================================================\n\n");
+
+		//Calling the continuePrompt() function
+		continuePrompt()
+	});
+}//End of viewProducts
+
+//Function to ask the customer if they wish to continue with another purchase, or end
+function continuePrompt() {
+	inquirer
+	.prompt(
+		{
+			name: "continue",
+			type: "confirm",
+			message: "Would you like to view the Main Menu for Manager View again?",
+		}
+	)
+	.then(function(answer) {
+		if(answer.continue === true) {
+			manager();
+		} else {
+			console.log(	"\n==== THANK YOU - GOODBYE ====\n\n");
+			//END CONNECTION
+			connection.end();
+		}
+	});
+}
