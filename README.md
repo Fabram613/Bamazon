@@ -45,7 +45,7 @@ Amazon-like storefront using MySQL and Node.js. The app takes in orders from cus
 ![Customer View Screen Shot](images/bamazonthird.png)
 
 4. Here is a quick video of the working app:
-![Customer View Video](images/bamazonCustomer.gif)
+![Customer View Video](images/customerview.gif)
 
 
 
