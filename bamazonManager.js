@@ -1,3 +1,4 @@
+//=======
 //REQUIRE
 //=======
 var mysql = require("mysql");
@@ -24,12 +25,16 @@ connection.connect(function (err) {
   manager();
 });
 
+//============
 //MAIN PROCESS
 //============
 
+//FUNCTIONS
+//=========
+
 // Function that prompts the manager
 function manager() {
-  //Begin a new query to the database
+  // Begin a new query to the database
   connection.query("SELECT * FROM products", function (error, results) {
     if (error) throw error;
 
@@ -50,9 +55,9 @@ function manager() {
       .then(function (answer) {
         // console.log("\n" + answer);
         // console.log("\n" + answer.managerPrompt);
-        //Switch statement that performs different actions depending on user's choice
+        // Switch statement that performs different actions depending on user's choice
         switch (answer.managerPrompt) {
-          //If user chooses View Products for Sale
+          // If user chooses View Products for Sale
           case "View Products for Sale":
             console.log(
               "\nYou have chosen to view all the products available for sale"
@@ -60,7 +65,7 @@ function manager() {
             viewProducts();
             break;
 
-          //If user chooses View Low Inventory
+          // If user chooses View Low Inventory
           case "View Low Inventory":
             console.log(
               "\nYou have chosen to view all the products with current low inventory"
@@ -68,7 +73,7 @@ function manager() {
             viewLowInv();
             break;
 
-          //If user chooses Add to Inventory
+          // If user chooses Add to Inventory
           case "Add to Inventory":
             console.log(
               "\nYou have chosen to add more quantity of a product to our inventory"
@@ -76,7 +81,7 @@ function manager() {
             addInventory();
             break;
 
-          //If user chooses Add New Product
+          // If user chooses Add New Product
           case "Add New Product":
             console.log(
               "\nYou have chosen to add a new product to our inventory"
@@ -84,19 +89,17 @@ function manager() {
             addNewProduct();
             break;
 
-          //If user chooses anything else
+          // If user chooses anything else
           default:
             console.log("\nPlease select one of the options provided");
         }
       });
   });
-} //End of manager function
+} // End of manager function
 
-//Function that runs when the manager selects View Products for Sale
+// Function that runs when the manager selects View Products for Sale
 function viewProducts() {
-  console.log(
-    "\nThese are all the products available at the moment: \n"
-  );
+  console.log("\nThese are all the products available at the moment: \n");
   connection.query(
     "SELECT id, product_name, price, stock_quantity FROM products",
     function (error, results) {
@@ -106,13 +109,13 @@ function viewProducts() {
           "\n\n=========================================================\n\n"
       );
 
-      //Calling the continuePrompt() function
+      // Calling the continuePrompt() function
       continuePrompt();
     }
   );
 } // End of viewProducts function
 
-//Function that runs when the manager selects View Low Inventory
+// Function that runs when the manager selects View Low Inventory
 function viewLowInv() {
   console.log(
     "\nThese are all the products with low inventory (below 5) at the moment: \n"
@@ -121,32 +124,32 @@ function viewLowInv() {
     "SELECT id, product_name, price, stock_quantity FROM products WHERE stock_quantity < 5",
     function (error, results) {
       if (error) throw error;
-      //Show only rows with low inventory (below 5)
+      // Show only rows with low inventory (below 5)
       console.log(
         JSON.stringify(results, null, " ") +
           "\n\n=========================================================\n\n"
       );
 
-      //Calling the continuePrompt() function
+      // Calling the continuePrompt() function
       continuePrompt();
     }
   );
 } // End of viewLowInv function
 
-//Function that runs when the manager selects Add to Inventory
+// Function that runs when the manager selects Add to Inventory
 function addInventory() {
-  //Prompt manager how much of which product to add
+  // Prompt manager how much of which product to add
   inquirer
     .prompt([
       {
-        //Asking for ID of the product they would like to restock.
+        // Asking for ID of the product they would like to restock.
         name: "id",
         type: "input",
         message:
           "Please enter the ID number of the product you wish to restock inventory for: ",
       },
       {
-        //Asking how many units of the product they would like to restock.
+        // Asking how many units of the product they would like to restock.
         name: "unitsToAdd",
         type: "input",
         message:
@@ -154,17 +157,17 @@ function addInventory() {
       },
     ])
     .then(function (answer) {
-      //Creating variables to hold the manager's choices:
+      // Creating variables to hold the manager's choices:
       var chosenProductID = answer.id;
       var chosenUnitsToAdd = parseInt(answer.unitsToAdd);
 
-      //Creating a new query
+      // Creating a new query
       connection.query(
         "SELECT * FROM products WHERE id = " + chosenProductID,
         function (error, results) {
           if (error) throw error;
 
-          //Capturing original values of the selected products
+          // Capturing original values of the selected products
           var id = results[0].id;
           var productName = results[0].product_name;
           var departmentName = results[0].department_name;
@@ -173,7 +176,7 @@ function addInventory() {
 
           var newProductStock = parseInt(originalStock + chosenUnitsToAdd);
 
-          //Update the database
+          // Update the database
           connection.query(
             "UPDATE products SET ? WHERE ?",
             [
@@ -187,7 +190,7 @@ function addInventory() {
             function (error, results) {
               if (error) throw error;
 
-              //SUCCESS!!
+              // SUCCESS!!
               console.log(
                 "\n==== YOUR STOCK WAS ADDED SUCCESSFULLY ====" +
                   "\n=====================================================================================" +
@@ -209,16 +212,78 @@ function addInventory() {
                   "\n=====================================================================================\n\n"
               );
 
-              //Calling the continuePrompt() function
+              // Calling the continuePrompt() function
               continuePrompt();
             }
           );
         }
       );
     });
-} //End of addInventory function
+} // End of addInventory function
 
-//Function to ask the customer if they wish to continue with another purchase, or end
+// Function that runs when the manager selects Add New Product
+function addNewProduct() {
+  // Prompt the manager for information on the new product
+  inquirer
+    .prompt([
+      {
+        name: "productName",
+        type: "input",
+        message: "What is the name of the new Product you wish to add?",
+      },
+      {
+        name: "productCategory",
+        type: "input",
+        message: "What is the category of the new Product you wish to add?",
+      },
+      {
+        name: "price",
+        type: "input",
+        message:
+          "What is the price per unit of the new Product you wish to add? (Enter as 12.99)",
+      },
+      {
+        name: "stockQuantity",
+        type: "input",
+        message:
+          "How many units of the new Product do you wish to add to the inventory? (Enter a whole number)",
+      },
+    ])
+    .then(function (answer) {
+      // Establish a new query
+      connection.query(
+        "INSERT INTO products SET ?",
+        {
+          product_name: answer.productName,
+          department_name: answer.productCategory,
+          price: parseFloat(answer.price),
+          stock_quantity: parseInt(answer.stockQuantity),
+        },
+        function (error, results) {
+          if (error) throw error;
+          // SUCCESS!!!
+          console.log(
+            "\n==== YOUR NEW ITEM WAS ADDED SUCCESSFULLY ====" +
+              "\n==============================================" +
+              "\nProduct Name:\t\t\t" +
+              answer.productName +
+              "\nProduct Category:\t\t" +
+              answer.productCategory +
+              "\nPrice Per Unit:\t\t\t$" +
+              parseFloat(answer.price) +
+              "\nStock Quantity:\t\t\t" +
+              parseInt(answer.stockQuantity) +
+              "\n==============================================\n\n"
+          );
+
+          // Calling the continuePrompt() function
+          continuePrompt();
+        }
+      );
+    });
+} //E nd of addNewProduct function
+
+// Function to ask the customer if they wish to continue with another purchase, or end
 function continuePrompt() {
   inquirer
     .prompt({
@@ -236,3 +301,7 @@ function continuePrompt() {
       }
     });
 }
+
+//================
+//END MAIN PROCESS
+//================

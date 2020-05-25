@@ -1,3 +1,4 @@
+//=======
 //REQUIRE
 //=======
 var mysql = require("mysql");
@@ -24,12 +25,16 @@ connection.connect(function (err) {
   start();
 });
 
+//============
 //MAIN PROCESS
 //============
 
+//FUNCTIONS
+//=========
+
 // Function that prompts the user
 function start() {
-  //Displaying all of the items available for sale.
+  // Displaying all of the items available for sale.
   console.log(
     "These are all the products available on BAMAZON at the moment: \n"
   );
@@ -49,14 +54,14 @@ function start() {
     inquirer
       .prompt([
         {
-          //Asking for ID of the product they would like to buy.
+          // Asking for ID of the product they would like to buy.
           name: "idChosen",
           type: "input",
           message:
             "Please enter the ID number of the product you wish to purchase: ",
         },
         {
-          //Asking how many units of the product they would like to buy.
+          // Asking how many units of the product they would like to buy.
           name: "unitsPurchased",
           type: "input",
           message: "How many units of this product would you like to purchase?",
@@ -67,7 +72,7 @@ function start() {
           "\nYOUR ORDER HAS BEEN PLACED!!!\n\nLet me check our stock for you...\n"
         );
 
-        //Creating variables to hold the customer's choices:
+        // Creating variables to hold the customer's choices:
         var chosenProductID = answer.idChosen;
         var chosenProductUnits = answer.unitsPurchased;
 
@@ -82,15 +87,15 @@ function start() {
           function (error, results) {
             if (error) throw error;
 
-            //This variable stores the current stock quantity of the Chosen product
+            // This variable stores the current stock quantity of the Chosen product
             var currentStock = results[0].stock_quantity;
 
             if (chosenProductUnits > currentStock) {
-              //If BAMAZON doesn't have enough stock
+              // If BAMAZON doesn't have enough stock
               console.log(
                 "==== YOUR ORDER HAS BEEN CANCELLED DUE TO INSUFFICIENT QUANTITY ====\n"
               );
-              //Calling the continue
+              // Calling the continue
               continuePrompt();
             } else {
               // If BAMAZON does have enough of the product, fulfill the customer's order.
@@ -98,7 +103,7 @@ function start() {
                 "==== ITEMS ARE IN STOCK - YOUR ORDER HAS BEEN PROCESSED ====\n"
               );
 
-              //set the total cost and information of the product selected
+              // Set the total cost and information of the product selected.
               var id = results[0].id;
               var productName = results[0].product_name;
               var departmentName = results[0].department_name;
@@ -106,7 +111,7 @@ function start() {
               var originalStock = results[0].stock_quantity;
               var totalCost = parseFloat(price * chosenProductUnits);
 
-              //Updating the SQL database to reflect the remaining quantity.
+              // Updating the SQL database to reflect the remaining quantity.
               var newChosenProductStock = currentStock - chosenProductUnits;
               connection.query(
                 "UPDATE products SET ? WHERE ?",
@@ -119,7 +124,7 @@ function start() {
                   },
                 ],
                 function (error, results) {
-                  //UPDATE SUCCESS!
+                  // SUCCESS!
                   console.log(
                     "Our product stock quantity of " +
                       originalStock +
@@ -128,7 +133,7 @@ function start() {
                       ".\n"
                   );
 
-                  //Once the update goes through, show the customer the total cost of their purchase.
+                  // Once the update goes through, show the customer the total cost of their purchase.
                   console.log(
                     "=====================================================================================" +
                       "\nItem number:\t\t\t" +
@@ -147,7 +152,7 @@ function start() {
                       "\n=====================================================================================\n\n"
                   );
 
-                  //Calling the continue
+                  // Calling the continue
                   continuePrompt();
                 }
               );
@@ -176,4 +181,8 @@ function continuePrompt() {
         connection.end();
       }
     });
-}
+} // End of continuePrompt function
+
+//================
+//END MAIN PROCESS
+//================
