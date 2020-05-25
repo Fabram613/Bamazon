@@ -94,33 +94,145 @@ function manager() {
 
 //Function that runs when the manager selects View Products for Sale
 function viewProducts() {
-	console.log("\nThese are all the products available on BAMAZON right now: \n");
-	connection.query("SELECT id, product_name, price, stock_quantity FROM products", function(error, results) {
-		if (error) throw error;
-		console.log(JSON.stringify(results, null, " ") + "\n\n=========================================================\n\n");
+  console.log(
+    "\nThese are all the products available at the moment: \n"
+  );
+  connection.query(
+    "SELECT id, product_name, price, stock_quantity FROM products",
+    function (error, results) {
+      if (error) throw error;
+      console.log(
+        JSON.stringify(results, null, " ") +
+          "\n\n=========================================================\n\n"
+      );
 
-		//Calling the continuePrompt() function
-		continuePrompt()
-	});
-}//End of viewProducts
+      //Calling the continuePrompt() function
+      continuePrompt();
+    }
+  );
+} // End of viewProducts function
+
+//Function that runs when the manager selects View Low Inventory
+function viewLowInv() {
+  console.log(
+    "\nThese are all the products with low inventory (below 5) at the moment: \n"
+  );
+  connection.query(
+    "SELECT id, product_name, price, stock_quantity FROM products WHERE stock_quantity < 5",
+    function (error, results) {
+      if (error) throw error;
+      //Show only rows with low inventory (below 5)
+      console.log(
+        JSON.stringify(results, null, " ") +
+          "\n\n=========================================================\n\n"
+      );
+
+      //Calling the continuePrompt() function
+      continuePrompt();
+    }
+  );
+} // End of viewLowInv function
+
+//Function that runs when the manager selects Add to Inventory
+function addInventory() {
+  //Prompt manager how much of which product to add
+  inquirer
+    .prompt([
+      {
+        //Asking for ID of the product they would like to restock.
+        name: "id",
+        type: "input",
+        message:
+          "Please enter the ID number of the product you wish to restock inventory for: ",
+      },
+      {
+        //Asking how many units of the product they would like to restock.
+        name: "unitsToAdd",
+        type: "input",
+        message:
+          "How many units of this product would you like to add to the inventory?",
+      },
+    ])
+    .then(function (answer) {
+      //Creating variables to hold the manager's choices:
+      var chosenProductID = answer.id;
+      var chosenUnitsToAdd = parseInt(answer.unitsToAdd);
+
+      //Creating a new query
+      connection.query(
+        "SELECT * FROM products WHERE id = " + chosenProductID,
+        function (error, results) {
+          if (error) throw error;
+
+          //Capturing original values of the selected products
+          var id = results[0].id;
+          var productName = results[0].product_name;
+          var departmentName = results[0].department_name;
+          var price = results[0].price;
+          var originalStock = parseInt(results[0].stock_quantity);
+
+          var newProductStock = parseInt(originalStock + chosenUnitsToAdd);
+
+          //Update the database
+          connection.query(
+            "UPDATE products SET ? WHERE ?",
+            [
+              {
+                stock_quantity: newProductStock,
+              },
+              {
+                id: id,
+              },
+            ],
+            function (error, results) {
+              if (error) throw error;
+
+              //SUCCESS!!
+              console.log(
+                "\n==== YOUR STOCK WAS ADDED SUCCESSFULLY ====" +
+                  "\n=====================================================================================" +
+                  "\nItem number:\t\t\t" +
+                  id +
+                  "\nProduct Name:\t\t\t" +
+                  productName +
+                  "\nProduct Category:\t\t" +
+                  departmentName +
+                  "\nPrice Per Unit:\t\t\t" +
+                  price +
+                  "\nOriginal Stock Quantity:\t" +
+                  originalStock +
+                  "\nYou added more stock:\t\t" +
+                  chosenUnitsToAdd +
+                  "\n-------------------------------------------------" +
+                  "\nTHE NEW STOCK QUANTITY IS:\t" +
+                  newProductStock +
+                  "\n=====================================================================================\n\n"
+              );
+
+              //Calling the continuePrompt() function
+              continuePrompt();
+            }
+          );
+        }
+      );
+    });
+} //End of addInventory function
 
 //Function to ask the customer if they wish to continue with another purchase, or end
 function continuePrompt() {
-	inquirer
-	.prompt(
-		{
-			name: "continue",
-			type: "confirm",
-			message: "Would you like to view the Main Menu for Manager View again?",
-		}
-	)
-	.then(function(answer) {
-		if(answer.continue === true) {
-			manager();
-		} else {
-			console.log(	"\n==== THANK YOU - GOODBYE ====\n\n");
-			//END CONNECTION
-			connection.end();
-		}
-	});
+  inquirer
+    .prompt({
+      name: "continue",
+      type: "confirm",
+      message: "Would you like to view the Main Menu for Manager View again?",
+    })
+    .then(function (answer) {
+      if (answer.continue === true) {
+        manager();
+      } else {
+        console.log("\n==== THANK YOU - GOODBYE ====\n\n");
+        //END CONNECTION
+        connection.end();
+      }
+    });
 }
