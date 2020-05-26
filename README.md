@@ -82,10 +82,10 @@ Amazon-like storefront using MySQL and Node.js. The app takes in orders from cus
 3. Lastly, the final option of "Add New Product" is selected to add a new item to the table of available items. User is prompted to enter the item name, category, price per unit, and number of units. Here the user added a Wireless Headset under the category "Electronics" and is alerted of the successful addition:
 ![Manager View](images/bmanagerthird.png)
 
-4. Here is a quick video of the working app:
-<iframe src='https://gfycat.com/ifr/RawNearFlyingfish' frameborder='0' scrolling='no' allowfullscreen width='640' height='602'></iframe>
+4. Here is a quick video of the working app, click picture below:
+[<img src="images/bmanagerfirst.png">](https://gfycat.com/rawnearflyingfish)
 
-### Additional Screenshots of the initial Database Creation
+### Additional Screenshots of the Initial Database Creation
 
 1. Here is a screenshot of MySQLWorkbench and the process for initially creating the database:
 
