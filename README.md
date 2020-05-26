@@ -83,7 +83,7 @@ Amazon-like storefront using MySQL and Node.js. The app takes in orders from cus
 ![Manager View](images/bmanagerthird.png)
 
 4. Here is a quick video of the working app:
-![Manager View Video](images/bamazonManager.gif)
+<iframe src='https://gfycat.com/ifr/RawNearFlyingfish' frameborder='0' scrolling='no' allowfullscreen width='640' height='602'></iframe>
 
 ### Additional Screenshots of the initial Database Creation
 
